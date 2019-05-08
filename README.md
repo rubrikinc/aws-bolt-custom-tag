@@ -1,8 +1,6 @@
 # aws-bolt-custom-tag
 
-## :hammer: Installation
-
-## :mag: Example
+Many Rubrik customers use cost allocation tags in order to assign cost centers to various assets runninng in their AWS accounts. In order to accomodate such cost allocation methods, the following solution has been created in order to allow for the assignment of custom tags to Rubrik's ephemeral EC2 instnaces.
 
 ## :blue_book: Documentation
 
