@@ -21,7 +21,7 @@ The solution consists of the following components:
     * set the runtime to Python 3.7
     * choose `Use existing role` and select your newly created role 
     * click create function
-    * in your newly created function, paste the contents of lambda_function.py and click save
+    * in your newly created function, paste the contents of [lambda_function.py](../lambda_function.py) and click save
 4) Create CloudWatch Events Rule
     * Click Create role in the Cloudwatch Events console
     * Paste the contents of [rk_bolt_run_event.json](../rk_bolt_run_event.json) into the Cloudwatch Event pattern
