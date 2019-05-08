@@ -24,7 +24,8 @@ The solution consists of the following components:
     * in your newly created function, paste the contents of lambda_function.py and click save
 4) Create CloudWatch Events Rule
     * Click Create role in the Cloudwatch Events console
-    * Paste the contents of rk_bolt_run_event.json into the Cloudwatch Event pattern
+    * Paste the contents of [rk_bolt_run_event.json](../rk_bolt_run_event.json) into the Cloudwatch Event pattern
+      * You can remove the second key value pair referencing rK_cluster_id from this policy if you want it to tag all bolt instances regardless of cluster id
     * Select your newly created Lambda function as the target
     * Click configure details, name and describe your rule as desired, and click create rule
 5) Edit the `custom_tags` variable in your lambda function to specify which tags should be applied to any bolt insntances that are provisioned
