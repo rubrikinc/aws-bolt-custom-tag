@@ -18,7 +18,7 @@ The solution consists of the following components:
     * select the policy created with [role_policy.json](../role_policy.json) as the permissions policy
 3) Create Lambda function
     * name the function as desired
-    * set the runtime to Pythin 3.7
+    * set the runtime to Python 3.7
     * choose `Use existing role` and select your newly created role 
     * click create function
     * in your newly created function, paste the contents of lambda_function.py and click save
