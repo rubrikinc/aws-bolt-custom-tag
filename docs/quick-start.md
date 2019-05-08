@@ -12,10 +12,10 @@ The solution consists of the following components:
 * A Cloudwatch event rule, used to trigger the Lambda function when a Rubrik Bolt instance is proision
 
 ## Installation
-1) Create an IAM policy using [role_policy.json](./role_policy.json) as the policy document
+1) Create an IAM policy using [role_policy.json](../role_policy.json) as the policy document
 2) Create an IAM role
     * select Lambda as the trusted entity
-    * select the policy create with [role_policy.json](./role_policy.json) as the permissions policy
+    * select the policy create with [role_policy.json](../role_policy.json) as the permissions policy
 3) Create Lambda function
     * name the function as desired
     * set the runtime to Pythin 3.7
