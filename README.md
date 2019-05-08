@@ -1,14 +1,12 @@
-# aws-bolt-custom-tag
+# Rubrik Bolt Instance - Custom Tags
 
-## :hammer: Installation
-
-## :mag: Example
+Many Rubrik customers use cost allocation tags in order to assign cost centers to various assets runninng in their AWS accounts. In order to accomodate such cost allocation methods, the following solution has been created in order to allow for the assignment of custom tags to Rubrik's ephemeral EC2 instnaces.
 
 ## :blue_book: Documentation
 
 Here are some resources to get you started! If you find any challenges from this project are not properly documented or are unclear, please raise an issueand let us know! This is a fun, safe environment - don't worry if you're a GitHub newbie! :heart:
 
-* Quick Start Guide
+* [Quick Start Guide](./docs/quick-start.md)
 * [Rubrik API Documentation](https://github.com/rubrikinc/api-documentation)
 
 ## :muscle: How You Can Help
