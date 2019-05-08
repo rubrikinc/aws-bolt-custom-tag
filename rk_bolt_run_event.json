@@ -1,0 +1,37 @@
+Formatted JSON Data
+{  
+   "source":[  
+      "aws.ec2"
+   ],
+   "detail-type":[  
+      "AWS API Call via CloudTrail"
+   ],
+   "detail":{  
+      "eventSource":[  
+         "ec2.amazonaws.com"
+      ],
+      "eventName":[  
+         "RunInstances"
+      ],
+      "requestParameters":{  
+         "tagSpecificationSet":{  
+            "items":{  
+               "tags":{  
+                  "key":[  
+                     "rk_instance_class"
+                  ],
+                  "value":[  
+                     "TransientStormInstance"
+                  ],
+                  "key":[  
+                     "rk_cluster_id"
+                  ],
+                  "value":[  
+                     "cc19573c-db6c-418a-9d48-067a256543ba"
+                  ]
+               }
+            }
+         }
+      }
+   }
+}
