@@ -24,6 +24,18 @@ def lambda_handler(event, context):
             'statusCode': 400,
             'body': json.dumps('an error occured')
         }
+    for block_device in bolt.block_device_mappings:
+        volume = ec2resource.Volume(block_device['Ebs']['VolumeId'])
+        logger.info('attempting to add custom tags {} to volume {} in {}'.format(custom_tags, block_device['Ebs']['VolumeId'], event['detail']['awsRegion']))
+
+        try:
+            volume.create_tags(Tags=custom_tags)
+        except:
+            logger.info('an error occured')
+            return {
+                'statusCode': 400,
+                'body': json.dumps('an error occured')
+        }
     return {
             'statusCode': 200
     }
