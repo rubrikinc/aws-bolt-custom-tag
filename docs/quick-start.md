@@ -9,24 +9,25 @@ The solution consists of the following components:
 * An IAM Role, used to execute the lambda function
 * An IAM Policy, used to provide the necessary permissions to the IAM Role
 * A Lambda function, used to apply custom tags to the Rubrik Bolt instance
-* A Cloudwatch event rule, used to trigger the Lambda function when a Rubrik Bolt instance is proision
+* A Cloudwatch event rule, used to trigger the Lambda function when a Rubrik Bolt instance is provisioned 
+* A CloudFormation template, used to deploy the above assets into AWS
 
 ## Installation
-1) Create an IAM policy using [role_policy.json](../role_policy.json) as the policy document
-2) Create an IAM role
-    * select Lambda as the trusted entity
-    * select the policy created with [role_policy.json](../role_policy.json) as the permissions policy
-3) Create Lambda function
-    * name the function as desired
-    * set the runtime to Python 3.7
-    * choose `Use existing role` and select your newly created role 
-    * click create function
-    * in your newly created function, paste the contents of [lambda_function.py](../lambda_function.py) and click save
-4) Create CloudWatch Events Rule
-    * Click Create role in the Cloudwatch Events console
-    * Paste the contents of [rk_bolt_run_event.json](../rk_bolt_run_event.json) into the Cloudwatch Event pattern
-    * Update the value of the `rk_cluster_id` tag in the Cloudwatch Event pattern to match your Rubrik cluster id
-      * You can remove the second key value pair referencing rk_cluster_id from this policy if you want it to tag all bolt instances regardless of cluster id
-    * Select your newly created Lambda function as the target
-    * Click configure details, name and describe your rule as desired, and click create rule
-5) Edit the `custom_tags` variable in your lambda function to specify which tags should be applied to any bolt insntances that are provisioned
+1) Download and package the Lambda function
+    * download `lambda_function.py` from this repo
+    * edit the `custom_tags` variable in the script as needed. This variable dictates which tags will be applied to bolt when it runs.
+    * zip `lambda_function.py` into a zip file named `rubrik_bolt_tag_function.zip`
+    * upload `rubrik_bolt_tag.zip` into a S3 bucket located in the region where you wil be deploying this solution
+2) Deploy the solution using CloudFormation
+    * Create a new stack in your AWS account using `deploy_function_cft.yml`, this template takes the following parameters, all are required:
+      * LambdaS3Bucket - Name of the S3 bucket containing your Lambda function zip file - default: none
+      * LambdaZipName - Name of the zip file that contains your lambda function - default: rubrik_bolt_tag_function.zip
+      * IAMRoleName - Name used for Lambda IAM Role - default: rubrik_bolt_tag_role
+      * IAMPolicyName - Name used for Lambda IAM Policy - default: rubrik_bolt_tag_policy
+      * CloudWatchEventName - Name used for CloudWatch Event Rule - default: rubrik_bolt_tag_event
+      * LambdaFunctionName - Name used for Lambda Function - default: rubrik_bolt_tag_function
+3) Verify the solution has successfully deployed
+   * The stack should successfully create the Role, Policy, Function, and CloudWatch Event Rule:
+![image](https://user-images.githubusercontent.com/16825470/66139399-5bf02800-e5ce-11e9-8c55-8bb991756343.png)
+   * Once deployed, new bolt instances should be tagged with the custom tags specified in the `custom_tags` variable
+   * Logs for each run will be pushed to a log stream in CloudWatch Logs
