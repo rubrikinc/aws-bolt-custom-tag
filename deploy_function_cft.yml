@@ -1,0 +1,135 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Deploys IAM Role, IAM Policy, CloudWatch Events Rule, and Lambda Function to assign custom AWS tags to Rubrik Bolt instances
+Parameters: 
+  LambdaS3Bucket:
+    Type: String
+    AllowedPattern: "^[0-9a-z]+([0-9a-z-]*[0-9a-z])*$"
+    ConstraintDescription: "Bucket name can include numbers, lowercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
+    Description: "Name of the S3 bucket that contains your Lambda function zip file"
+  LambdaZipName:
+    Type: String
+    Default: rubrik_bolt_tag_function.zip
+    AllowedPattern: ".+"
+    ConstraintDescription: "Zip file name cannot be blank"
+    Description: "Name of the zip file that contains your lambda function"
+  IAMRoleName:
+    Type: String
+    Default: rubrik_bolt_tag_role
+    AllowedPattern: ".+"
+    ConstraintDescription: "Role name cannot be blank"
+    Description: "Name used for Lambda IAM Role"
+  IAMPolicyName:
+    Type: String
+    Default: rubrik_bolt_tag_policy
+    AllowedPattern: ".+"
+    ConstraintDescription: "Policy name cannot be blank"
+    Description: "Name used for Lambda IAM Policy"
+  CloudWatchEventName:
+    Type: String
+    Default: rubrik_bolt_tag_event
+    AllowedPattern: ".+"
+    ConstraintDescription: "Event name cannot be blank"
+    Description: "Name used for CloudWatch Event Rule"
+  LambdaFunctionName:
+    Type: String
+    Default: rubrik_bolt_tag_function
+    AllowedPattern: ".+"
+    ConstraintDescription: "Function name cannot be blank"
+    Description: "Name used for Lambda Function"
+Resources: 
+  RubrikLambdaRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: !Ref IAMRoleName
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com" 
+            Action: 
+              - "sts:AssumeRole"
+  RubrikLambdaPolicy:
+    Type: AWS::IAM::Policy 
+    Properties:
+      PolicyName: !Ref IAMPolicyName
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Action:
+              - "logs:CreateLogStream"
+              - "logs:CreateLogGroup"
+              - "logs:PutLogEvents"
+              - "ec2:DescribeInstances"
+              - "ec2:CreateTags"
+            Resource: "*"
+      Roles: 
+        -
+          Ref: RubrikLambdaRole
+  RubrikCloudWatchEvent: 
+    Type: AWS::Events::Rule
+    Properties: 
+      Name: !Ref CloudWatchEventName
+      Description: "Cloudwatch Events rule used to invoke Rubrik Bolt custom tagging Lambda function"
+      EventPattern: 
+        source:
+        - aws.ec2
+        detail-type:
+        - AWS API Call via CloudTrail
+        detail:
+          eventSource:
+          - ec2.amazonaws.com
+          eventName:
+          - RunInstances
+          requestParameters:
+            tagSpecificationSet:
+              items:
+                tags:
+                  key:
+                  - rk_instance_class
+                  value:
+                  - TransientStormInstance
+      State: "ENABLED"
+      Targets:
+        -
+          Arn: !GetAtt RubrikBoltTagFunction.Arn
+          Id: "RubrikBoltTagFunction"
+  RubrikBoltTagFunction: 
+    Type: "AWS::Lambda::Function"
+    Properties: 
+      FunctionName:
+        Ref: "LambdaFunctionName"
+      Handler: "lambda_function.lambda_handler"
+      Role: 
+        Fn::GetAtt: 
+          - "RubrikLambdaRole"
+          - "Arn"
+      Code: 
+        S3Bucket: !Ref LambdaS3Bucket
+        S3Key: !Ref LambdaZipName
+      Runtime: "python3.7"
+      Timeout: 25
+  RubrikPermissionForEventsToInvokeLambda: 
+    Type: AWS::Lambda::Permission
+    Properties: 
+      FunctionName: 
+        Ref: "LambdaFunctionName"
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: 
+        Fn::GetAtt: 
+          - "RubrikCloudWatchEvent"
+          - "Arn"
+Outputs:
+  RubrikRoleARN:
+    Value: !GetAtt RubrikLambdaRole.Arn
+  RubrikPolicyARN: 
+    Value: !GetAtt RubrikLambdaRole.Arn
+  RubrikEventARN:
+    Value: !GetAtt RubrikCloudWatchEvent.Arn
+  RubrikFunctionARN:
+    Value: !GetAtt RubrikBoltTagFunction.Arn
